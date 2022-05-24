@@ -1,1 +1,5 @@
 xircuits
+pandas
+seaborn
+scikit-learn
+tensorflow
