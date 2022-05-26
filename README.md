@@ -41,3 +41,7 @@ xircuits
 ## Workflow in this Template
 
 #### iris_classification.xircuits
+
+- In this template, we used the iris dataset and perform a simple classification. You can further fine tune the model by modifying the hyperparameters.
+
+![Template](images/iris_template.gif)
