@@ -1,21 +1,47 @@
 # Xircuits Project Template
 
-A Xircuits Project Template is a project that utilizes the Xircuits engine, whether it is training a model or running a workflow.
+This template allows you to train an iris classifier, using the [Iris dataset](http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data).
 
-This section should have a short description on what is does.
+It consists of the components needed to build and train a one dimensional neural network model:
+
+- Dataset preparation: this section handles the dataset used in this template through multiple components.
+
+  - `LoadDatasetURL` : download Iris dataset from [URL](http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data).
+  - `VisualizeData` : visualize the training data (optional)
+  - `SplitDataAndLabel` : split data and label to X and Y respectively
+  - `TrainTestSplit` : split data to training and testing dataset
+
+- Model training: build and compile the model for training.
+  - `Create1DModel` : building a one dimensional neural network model.
+  - `TrainNNModel` : training the model with training dataset.
+  - `PlotTrainingMetrics` : evaluate training performance, by plotting the training loss and accuracy against the number of training epochs.
+  - `EvaluateNNModel` : determine the model loss and accuracy based on the testing dataset.
+  - `SaveNNModel` : save model in keras or tensorflow format.
+  - `ConvertTFModelToOnnx` : convert TF model to onnx model to be used in other platforms.
 
 ## Prerequisites
 
-A project may have prerequisites such as models that needs to be downloaded or non-python related setup. You may list them down here.
+You will need Python 3.9+.
 
 ## Installation
+
+1. Clone this repository
+2. Create virtual environments and install the required python packages.
 
 ```
 pip install -r requirements.txt
 ```
 
-## Updating Xircuits Project Template
+3. Run xircuits from the root directory
+
 ```
-git remote add template https://github.com/XpressAI/xircuits-project-template
-git fetch --all
+xircuits
 ```
+
+## Workflow in this Template
+
+#### IrisClassification.xircuits
+
+- In this template, we used the iris dataset and perform a simple classification. You can further fine tune the model by modifying the hyperparameters.
+
+![Template](images/iris_template.gif)
