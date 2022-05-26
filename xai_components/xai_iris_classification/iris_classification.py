@@ -113,10 +113,15 @@ class TrainTestSplit(Component):
 #------------------------------------------------------------------------------
 @xai_component
 class Create1DModel(Component):
+    loss: InArg[str]
+    optimizer: InArg[str]
+    
     model: OutArg[any]
     
     def __init__(self):
         self.done = False
+        self.loss = InArg(None)
+        self.optimizer = InArg(None)
         
         self.model = OutArg(None)
         
@@ -135,8 +140,8 @@ class Create1DModel(Component):
         ])
 
         model.compile(
-            loss='categorical_crossentropy',
-            optimizer='adam',
+            loss=self.loss.value,
+            optimizer=self.optimizer.value,
             metrics=['accuracy']
         )
         model.summary()
@@ -200,22 +205,26 @@ class PlotTrainingMetrics(Component):
 
         loss = history['loss']
         val_loss = history['val_loss']
+        
+        epochs = range(1, len(acc)+1)
 
         plt.figure(figsize=(8, 8))
         plt.subplot(2, 1, 1)
-        plt.plot(acc, label='Training Accuracy')
-        plt.plot(val_acc, label='Validation Accuracy')
+        plt.plot(epochs, acc, label='Training Accuracy')
+        plt.plot(epochs, val_acc, label='Validation Accuracy')
         plt.ylim([0, 1])
+        plt.xticks(epochs)
         plt.legend(loc='lower right')
         plt.title('Training and Validation Accuracy')
 
         plt.subplot(2, 1, 2)
-        plt.plot(loss, label='Training Loss')
-        plt.plot(val_loss, label='Validation Loss')
+        plt.plot(epochs, loss, label='Training Loss')
+        plt.plot(epochs, val_loss, label='Validation Loss')
         plt.ylim([0, 1.0])
+        plt.xticks(epochs)
         plt.legend(loc='upper right')
         plt.title('Training and Validation Loss')
-        plt.xlabel('epoch')
+        plt.xlabel('epochs')
         plt.show()
 
         self.done = True
@@ -252,18 +261,18 @@ class EvaluateNNModel(Component):
 #------------------------------------------------------------------------------
 @xai_component
 class SaveNNModel(Component):
-    model_name: InArg[str]
+    save_model_path: InArg[str]
     keras_format: InArg[bool]
     
     def __init__(self):
         self.done = False
-        self.model_name = InArg(None)
+        self.save_model_path = InArg(None)
         self.keras_format = InArg(False)
     
     def execute(self, ctx):
         import os
         model = ctx['trained_model']
-        model_name = self.model_name.value
+        model_name = self.save_model_path.value
 
         dirname = os.path.dirname(model_name)
         
@@ -285,21 +294,21 @@ class SaveNNModel(Component):
 #------------------------------------------------------------------------------
 @xai_component
 class ConvertTFModelToOnnx(Component):
-    output_model: InArg[str]
+    output_onnx_path: InArg[str]
     
     def __init__(self):
         self.done = False
-        self.output_model = InArg(None)
+        self.output_onnx_path = InArg(None)
         
     def execute(self, ctx):
         import os
         saved_model = ctx['saved_model_path']
-        model_path = self.output_model.value
-        dirname = os.path.dirname(model_path)
+        onnx_path = self.output_onnx_path.value
+        dirname = os.path.dirname(onnx_path)
         if len(dirname):
             os.makedirs(dirname, exist_ok=True)
             
-        os.system(f"python -m tf2onnx.convert --saved-model {saved_model} --opset 11 --output {model_path}.onnx")
-        print(f'Converted {saved_model} TF model to {model_path}.onnx')
+        os.system(f"python -m tf2onnx.convert --saved-model {saved_model} --opset 11 --output {onnx_path}.onnx")
+        print(f'Converted {saved_model} TF model to {onnx_path}.onnx')
         
         self.done = True
