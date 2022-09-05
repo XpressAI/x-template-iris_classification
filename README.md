@@ -1,4 +1,4 @@
-# Xircuits Project Template
+# Xircuits Iris Classification Project Template
 
 This template allows you to train an iris classifier, using the [Iris dataset](http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data).
 
