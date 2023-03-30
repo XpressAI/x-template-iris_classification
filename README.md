@@ -44,4 +44,4 @@ xircuits
 
 - In this template, we used the iris dataset and perform a simple classification. You can further fine tune the model by modifying the hyperparameters.
 
-![Template](images/iris_template.gif)
+![Template](https://github.com/XpressAI/x-template-iris_classification/raw/main/images/iris_template.gif)
