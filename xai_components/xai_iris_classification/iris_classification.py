@@ -8,11 +8,6 @@ class LoadDatasetURL(Component):
     url: InArg[str]
     column_names: InArg[list]
     
-    def __init__(self):
-        self.done = False
-        self.url = InArg(None)
-        self.column_names = InArg(None)
-    
     def execute(self, ctx) -> None:
         import pandas as pd
         url = self.url.value
@@ -21,18 +16,12 @@ class LoadDatasetURL(Component):
         # dataset["class"] = dataset["class"].str.replace("Iris-","") # Iris-setosa --> setosa
         ctx.update({'dataset': dataset})
         
-        self.done = True
-
 #------------------------------------------------------------------------------
-#                    Xircuits Component : VisualizaData
+#                    Xircuits Component : VisualizeData
 #------------------------------------------------------------------------------
 @xai_component
 class VisualizeData(Component):
     target_column: InArg[str]
-    
-    def __init__(self):
-        self.done = False
-        self.target_column = InArg(None)
         
     def execute(self, ctx) -> None:
         import seaborn as sns
@@ -40,19 +29,13 @@ class VisualizeData(Component):
         print(dataset.head())
         target_column = self.target_column.value
         sns.pairplot(dataset, hue=target_column)
-        
-        self.done = True
-        
+
 #------------------------------------------------------------------------------
 #                    Xircuits Component : SplitDataAndLabel
 #------------------------------------------------------------------------------
 @xai_component
 class SplitDataAndLabel(Component):
     label_column_index: InArg[int]
-    
-    def __init__(self):
-        self.done = False
-        self.label_column_index = InArg(None)
         
     def execute(self, ctx) -> None:
         dataset = ctx['dataset']
@@ -61,19 +44,14 @@ class SplitDataAndLabel(Component):
         Y = dataset.values[:, label_column_index]
 
         ctx.update({'X': X, 'Y':Y})
-        self.done = True
-        
+
 #------------------------------------------------------------------------------
 #                    Xircuits Component : TrainTestSplit
 #------------------------------------------------------------------------------
 @xai_component
 class TrainTestSplit(Component):
     test_percentage: InArg[float]
-    
-    def __init__(self):
-        self.done = False
-        self.test_percentage = InArg(None)
-        
+
     def execute(self, ctx) -> None:
         from sklearn.model_selection import train_test_split
         from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -106,8 +84,6 @@ class TrainTestSplit(Component):
              'y_train': y_train, 
              'y_test': y_test})    
         
-        self.done = True
-
 #------------------------------------------------------------------------------
 #                    Xircuits Component : Create1DModel
 #------------------------------------------------------------------------------
@@ -117,13 +93,6 @@ class Create1DModel(Component):
     optimizer: InArg[str]
     
     model: OutArg[any]
-    
-    def __init__(self):
-        self.done = False
-        self.loss = InArg(None)
-        self.optimizer = InArg(None)
-        
-        self.model = OutArg(None)
         
     def execute(self, ctx) -> None:
         from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
@@ -147,8 +116,6 @@ class Create1DModel(Component):
         model.summary()
         self.model.value = model
 
-        self.done = True
-        
 #------------------------------------------------------------------------------
 #                    Xircuits Component : TrainNNModel
 #------------------------------------------------------------------------------
@@ -158,13 +125,6 @@ class TrainNNModel(Component):
     training_epochs: InArg[int]
 
     training_metrics: OutArg[dict]
-
-    def __init__(self):
-        self.done = False
-        self.model = InArg.empty()
-        self.training_epochs = InArg.empty()
-        
-        self.training_metrics = OutArg.empty()
 
     def execute(self, ctx) -> None:
 
@@ -182,7 +142,6 @@ class TrainNNModel(Component):
         
         ctx.update({'trained_model': model})
         self.training_metrics.value = train.history
-        self.done = True
 
 #------------------------------------------------------------------------------
 #                    Xircuits Component : PlotTrainingMetrics
@@ -227,17 +186,12 @@ class PlotTrainingMetrics(Component):
         plt.xlabel('epochs')
         plt.show()
 
-        self.done = True
-
-        
 #------------------------------------------------------------------------------
 #                    Xircuits Component : EvaluateNNModel
 #------------------------------------------------------------------------------
 @xai_component
 class EvaluateNNModel(Component):
 
-    def __init__(self):
-        self.done = False
     
     def execute(self, ctx) -> None:
         import numpy as np
@@ -254,8 +208,7 @@ class EvaluateNNModel(Component):
         y_pred = [np.argmax(i) for i in y_pred]
         y_test = [np.argmax(i) for i in y_test]
         print(classification_report(y_test, y_pred, digits=10))
-        
-        self.done = True
+
 #------------------------------------------------------------------------------
 #                    Xircuits Component : SaveNNModel
 #------------------------------------------------------------------------------
@@ -287,19 +240,14 @@ class SaveNNModel(Component):
         model.save(model_name)
         print(f"Saving model at: {model_name}")
         ctx.update({'saved_model_path': model_name})
-        self.done = True
-        
+
 #------------------------------------------------------------------------------
 #                    Xircuits Component : ConvertTFModelToOnnx
 #------------------------------------------------------------------------------
 @xai_component
 class ConvertTFModelToOnnx(Component):
     output_onnx_path: InArg[str]
-    
-    def __init__(self):
-        self.done = False
-        self.output_onnx_path = InArg(None)
-        
+
     def execute(self, ctx):
         import os
         saved_model = ctx['saved_model_path']
@@ -310,5 +258,3 @@ class ConvertTFModelToOnnx(Component):
             
         os.system(f"python -m tf2onnx.convert --saved-model {saved_model} --opset 11 --output {onnx_path}.onnx")
         print(f'Converted {saved_model} TF model to {onnx_path}.onnx')
-        
-        self.done = True
